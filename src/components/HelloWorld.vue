@@ -28,15 +28,33 @@
       <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
     </ul>
+    <div id="placeholder" ref="placeholder"></div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
+import { ipcRenderer } from 'electron';
 
 @Component
 export default class HelloWorld extends Vue {
+
+  public $refs!: {
+        placeholder: HTMLDivElement;
+  };
+
   @Prop() private msg!: string;
+
+  public mounted() {
+      ipcRenderer.on('resultAvailable', (event: any, arg: any) => {
+        this.$refs.placeholder.innerText = '!' + JSON.stringify(arg);
+      });
+
+      document.addEventListener('DOMContentLoaded', (event) => {
+        ipcRenderer.send('mainWindowLoaded');
+        ipcRenderer.send('requestResult');
+    });
+  }
 }
 </script>
 

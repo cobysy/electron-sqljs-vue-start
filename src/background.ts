@@ -1,6 +1,8 @@
 'use strict';
 
-import { app, protocol, BrowserWindow } from 'electron';
+declare const __static: string;
+
+import { app, protocol, BrowserWindow, ipcMain } from 'electron';
 import {
   createProtocol,
   installVueDevtools,
@@ -68,3 +70,33 @@ if (isDevelopment) {
     }
   });
 }
+
+// In this file you can include the rest of your app"s specific main process
+// code. You can also put them in separate files and require them here.
+
+import * as fs from 'fs';
+import * as path from 'path';
+import { Database } from 'sql.js';
+
+console.log('--------------------------------------------');
+console.log('---------------diagnostics------------------');
+console.log('--------------------------------------------');
+console.log('cwd: ' + process.cwd());
+console.log('__static: ' + __static);
+console.log('--------------------------------------------');
+console.log('--------------------------------------------');
+console.log('--------------------------------------------');
+
+let db!: Database;
+
+ipcMain.on('mainWindowLoaded', () => {
+  db = new Database(fs.readFileSync(path.join(__static, 'hello.sqlite')));
+
+  const result = db.exec('SELECT * FROM hello');
+  win!.webContents.send('resultAvailable', result);
+});
+
+ipcMain.on('requestResult', () => {
+  const result = db.exec('SELECT * FROM hello');
+  win!.webContents.send('resultAvailable', result);
+});
