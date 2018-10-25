@@ -1,6 +1,6 @@
 # electron-sqljs-vue
 
-```
+```shell
 $ # Scaffold Vue project
 $ vue create electron-sqljs-vue-start
 $ # (selected typescript, tslint, unit test)
